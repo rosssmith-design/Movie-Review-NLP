@@ -3,6 +3,9 @@ from nltk.corpus import movie_reviews
 from nltk.corpus import stopwords
 import re
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score
 
 nltk.download('movie_reviews')
 nltk.download('stopwords')
@@ -31,12 +34,25 @@ def preprocess(text):
 texts = [preprocess(review[0]) for review in reviews]
 labels = [review[1] for review in reviews]
 
+# Vectorizing the preprocessed text
 vectorizer = CountVectorizer(max_features=2000)
 X = vectorizer.fit_transform(texts)
 
+# Spliting the data
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, random_state=42)
+
+# Train model
+model = MultinomialNB()
+model.fit(X_train, y_train)
+
+# Evaluate
+train_pred = model.predict(X_train)
+test_pred = model.predict(X_test)
 
 print(f"Total preprocessed reviews: {len(texts)}")
 print(f"Labels: {labels.count('neg')} negative, {labels.count('pos')} positive")
 print(f"Matrix shape: {X.shape}")
+print(f"Training Accuracy: {accuracy_score(y_train, train_pred) * 100:.2f}%")
+print(f"Test Accuracy: {accuracy_score(y_test, test_pred) * 100:.2f}%")
 
 

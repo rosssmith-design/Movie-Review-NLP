@@ -2,7 +2,7 @@ import nltk
 from nltk.corpus import movie_reviews
 from nltk.corpus import stopwords
 import re
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
@@ -35,7 +35,7 @@ texts = [preprocess(review[0]) for review in reviews]
 labels = [review[1] for review in reviews]
 
 # Vectorizing the preprocessed text
-vectorizer = TfidfVectorizer(max_features=5000)
+vectorizer = CountVectorizer(max_features=5000)
 X = vectorizer.fit_transform(texts)
 
 # Spliting the data

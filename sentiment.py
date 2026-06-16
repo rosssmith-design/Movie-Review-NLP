@@ -42,7 +42,7 @@ X = vectorizer.fit_transform(texts)
 X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, random_state=42)
 
 # Train model
-model = LogisticRegression(max_iter=1000)
+model = LogisticRegression(max_iter=1000, C=0.1)
 model.fit(X_train, y_train)
 
 # Evaluate

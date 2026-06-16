@@ -1,6 +1,7 @@
 import nltk 
 from nltk.corpus import movie_reviews
 from nltk.corpus import stopwords
+import re
 
 nltk.download('movie_reviews')
 nltk.download('stopwords')
@@ -11,11 +12,22 @@ reviews = [(movie_reviews.raw(fileid), category)
            for category in movie_reviews.categories()
            for fileid in movie_reviews.fileids(category)]
 
+# All english stop words
 stop_words = set(stopwords.words('english'))
 
-print(list(stop_words)[:20])
+def preprocess(text):
+    # Lowercase
+    text = text.lower()
+    # Removes punctuation and unknown characters
+    text = re.sub(r'[^a-z\s]', '', text)
+    # Remove stop words
+    words = text.split()
+    words = [w for w in words if w not in stop_words]
+    return ' '.join(words)
+
 
 print(f"Total reviews: {len(reviews)}")
 print(f"Categories: {movie_reviews.categories()}")
-print(reviews[0][0][:500])
-print(f"\nLabel: {reviews[0][1]}")
+
+print(preprocess(reviews[0][0])[:500])
+

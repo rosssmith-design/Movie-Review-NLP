@@ -2,6 +2,7 @@ import nltk
 from nltk.corpus import movie_reviews
 from nltk.corpus import stopwords
 import re
+from sklearn.feature_extraction.text import CountVectorizer
 
 nltk.download('movie_reviews')
 nltk.download('stopwords')
@@ -15,6 +16,7 @@ reviews = [(movie_reviews.raw(fileid), category)
 # All english stop words
 stop_words = set(stopwords.words('english'))
 
+# Preprocessing function for training
 def preprocess(text):
     # Lowercase
     text = text.lower()
@@ -25,9 +27,16 @@ def preprocess(text):
     words = [w for w in words if w not in stop_words]
     return ' '.join(words)
 
+# Applying preprocessing to all reviews
+texts = [preprocess(review[0]) for review in reviews]
+labels = [review[1] for review in reviews]
 
-print(f"Total reviews: {len(reviews)}")
-print(f"Categories: {movie_reviews.categories()}")
+vectorizer = CountVectorizer(max_features=2000)
+X = vectorizer.fit_transform(texts)
 
-print(preprocess(reviews[0][0])[:500])
+
+print(f"Total preprocessed reviews: {len(texts)}")
+print(f"Labels: {labels.count('neg')} negative, {labels.count('pos')} positive")
+print(f"Matrix shape: {X.shape}")
+
 

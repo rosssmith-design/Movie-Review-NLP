@@ -35,7 +35,7 @@ texts = [preprocess(review[0]) for review in reviews]
 labels = [review[1] for review in reviews]
 
 # Vectorizing the preprocessed text
-vectorizer = CountVectorizer(max_features=5000)
+vectorizer = CountVectorizer(max_features=10000)
 X = vectorizer.fit_transform(texts)
 
 # Spliting the data

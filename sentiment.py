@@ -43,7 +43,7 @@ X_test = vectorizer.transform(test_texts_clean)
 
 
 # Train model
-model = LogisticRegression(max_iter=1000, C=0.1)
+model = LogisticRegression(max_iter=1000, C=0.01)
 model.fit(X_train, train_labels)
 
 # Evaluate

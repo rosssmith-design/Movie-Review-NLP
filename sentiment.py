@@ -37,7 +37,7 @@ train_texts_clean = [preprocess(text) for text in train_texts]
 test_texts_clean = [preprocess(text) for text in test_texts]
 
 # Vectorizing the preprocessed text
-vectorizer = CountVectorizer(max_features=5000)
+vectorizer = CountVectorizer(max_features=5000, ngram_range=(1, 2))
 X_train = vectorizer.fit_transform(train_texts_clean)
 X_test = vectorizer.transform(test_texts_clean)
 
@@ -50,7 +50,7 @@ model.fit(X_train, train_labels)
 train_pred = model.predict(X_train)
 test_pred = model.predict(X_test)
 
-print(f"Total reviews: {len(dataset)}")
+
 
 print(f"Training Accuracy: {accuracy_score(train_labels, train_pred) * 100:.2f}%")
 print(f"Test Accuracy: {accuracy_score(test_labels, test_pred) * 100:.2f}%")

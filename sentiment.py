@@ -37,7 +37,7 @@ train_texts_clean = [preprocess(text) for text in train_texts]
 test_texts_clean = [preprocess(text) for text in test_texts]
 
 # Vectorizing the preprocessed text
-vectorizer = CountVectorizer(max_features=5000, ngram_range=(1, 2))
+vectorizer = CountVectorizer(max_features=20000, ngram_range=(1, 2))
 X_train = vectorizer.fit_transform(train_texts_clean)
 X_test = vectorizer.transform(test_texts_clean)
 

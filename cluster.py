@@ -1,6 +1,7 @@
 from datasets import load_dataset
 import re
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
+from sklearn.feature_extraction.text import TfidfVectorizer
 import joblib
 from sklearn.decomposition import PCA
 
@@ -27,7 +28,7 @@ unsupervised_texts = [item['text'] for item in dataset['unsupervised']]
 # Load saved model and vectorizer
 vectorizer = joblib.load('sentiment_vectorizer.pkl')
 model = joblib.load('sentiment_model.pkl')
-
+print(model)
 # Preprocess the unsupervised reviews
 unsupervised_clean = [preprocess(text) for text in unsupervised_texts]
 
@@ -35,7 +36,7 @@ unsupervised_clean = [preprocess(text) for text in unsupervised_texts]
 X_unsupervised = vectorizer.transform(unsupervised_clean)
 
 # Reduce to 100 dimensions 
-pca = PCA(n_components=500, random_state=42)
+pca = PCA(n_components=100, random_state=42)
 X_reduced = pca.fit_transform(X_unsupervised.toarray())
 
 

@@ -1,14 +1,15 @@
 import re
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from datasets import load_dataset
+import joblib
+
 dataset = load_dataset('stanfordnlp/imdb')
 
 print(dataset)
-print(dataset['train'][0])
+
 
 
 # Load reviews and labels
@@ -55,4 +56,7 @@ test_pred = model.predict(X_test)
 print(f"Training Accuracy: {accuracy_score(train_labels, train_pred) * 100:.2f}%")
 print(f"Test Accuracy: {accuracy_score(test_labels, test_pred) * 100:.2f}%")
 
+joblib.dump(model, 'sentiment_model.pkl')
+joblib.dump(vectorizer, 'sentiment_vectorizer.pkl')
 
+print('Model and vectorizer saved successfully')

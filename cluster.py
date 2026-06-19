@@ -35,7 +35,7 @@ unsupervised_clean = [preprocess(text) for text in unsupervised_texts]
 X_unsupervised = vectorizer.transform(unsupervised_clean)
 
 # Reduce to 100 dimensions 
-pca = PCA(n_components=100, random_state=42)
+pca = PCA(n_components=500, random_state=42)
 X_reduced = pca.fit_transform(X_unsupervised.toarray())
 
 

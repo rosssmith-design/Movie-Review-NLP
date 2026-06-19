@@ -3,7 +3,7 @@ import re
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 from sklearn.feature_extraction.text import TfidfVectorizer
 import joblib
-from sklearn.decomposition import PCA
+from sklearn.decomposition import TruncatedSVD
 import numpy as np
 
 
@@ -46,14 +46,12 @@ X_cluster = cluster_vectorizer.fit_transform(unsupervised_clean)
 
 
 # Reduce to 100 dimensions 
-pca = PCA(n_components=100, random_state=42)
-X_reduced = pca.fit_transform(X_cluster.toarray())
+svd =  TruncatedSVD(n_components=1000, random_state=42)
+X_reduced = svd.fit_transform(X_cluster)
 
 
 
 print(f"Matrix shape: {X_cluster.shape}")
 print(f"Reduced shape: {X_reduced.shape}")
-print(f"Variance explained: {pca.explained_variance_ratio_.sum()*100:.2f}%")
-print(f"Non-zero entries: {X_cluster.nnz}")
-print(f"Total entries: {X_cluster.shape[0] * X_cluster.shape[1]}")
-print(f"Sparsity: {(1 - X_cluster.nnz / (X_cluster.shape[0] * X_cluster.shape[1])) * 100:.2f}%")
+print(f"Variance explained: {svd.explained_variance_ratio_.sum()*100:.2f}%")
+

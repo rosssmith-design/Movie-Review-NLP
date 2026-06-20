@@ -44,7 +44,7 @@ sentiment_pred = model.predict(X_sentiment_input)
 print(f"Sentiment breakdown: {sum(sentiment_pred)} positive, {len(sentiment_pred) - sum(sentiment_pred)} negative")
 
 # Create a new dedicated vectorizer for clustering
-cluster_vectorizer = TfidfVectorizer(max_features=20000, max_df=0.5, ngram_range=(1, 1))
+cluster_vectorizer = TfidfVectorizer(max_features=20000, max_df=0.3, ngram_range=(1, 1))
 X_cluster = cluster_vectorizer.fit_transform(unsupervised_clean)
 
 

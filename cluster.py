@@ -52,7 +52,7 @@ X_cluster = cluster_vectorizer.fit_transform(unsupervised_clean)
 svd =  TruncatedSVD(n_components=1000, random_state=42)
 X_reduced = svd.fit_transform(X_cluster)
 
-def run_and_inspect_clusters(X_reduced, vectorizer, X_original, k=10, label=""):
+def run_and_inspect_clusters(X_reduced, vectorizer, X_original, k=15, label=""):
     kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
     cluster_labels = kmeans.fit_predict(X_reduced)
     
@@ -77,7 +77,7 @@ def run_and_inspect_clusters(X_reduced, vectorizer, X_original, k=10, label=""):
     return cluster_labels
 
 # Run on TF-IDF version
-labels_tfidf = run_and_inspect_clusters(X_reduced, cluster_vectorizer, X_cluster, k=10, label="TF-IDF + SVD (1000 components)")
+labels_tfidf = run_and_inspect_clusters(X_reduced, cluster_vectorizer, X_cluster, k=15, label="TF-IDF + SVD (1000 components)")
 
 print(f"Matrix shape: {X_cluster.shape}")
 print(f"Reduced shape: {X_reduced.shape}")

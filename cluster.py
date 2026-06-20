@@ -43,8 +43,15 @@ sentiment_pred = model.predict(X_sentiment_input)
 
 print(f"Sentiment breakdown: {sum(sentiment_pred)} positive, {len(sentiment_pred) - sum(sentiment_pred)} negative")
 
+# Custom specific stop words to help with clustering
+custom_stop_words = [
+    'movie', 'movies', 'film', 'films', 'just', 'like', 'really',
+    'good', 'bad', 'time', 'watch', 'story', 'great', 'best',
+    'character', 'characters', 'people', 'think', 'know', 'dont',
+    'seen', 'did', 'didnt', 'make', 'way', 'little'
+]
 # Create a new dedicated vectorizer for clustering
-cluster_vectorizer = TfidfVectorizer(max_features=20000, max_df=0.3, ngram_range=(1, 1))
+cluster_vectorizer = TfidfVectorizer(max_features=20000, ngram_range=(1, 1), stop_words=custom_stop_words)
 X_cluster = cluster_vectorizer.fit_transform(unsupervised_clean)
 
 

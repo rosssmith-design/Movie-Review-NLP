@@ -54,11 +54,38 @@ custom_stop_words = [
 cluster_vectorizer = TfidfVectorizer(max_features=20000, ngram_range=(1, 1), stop_words=custom_stop_words)
 X_cluster = cluster_vectorizer.fit_transform(unsupervised_clean)
 
-
 # Reduce to 100 dimensions 
 svd =  TruncatedSVD(n_components=1000, random_state=42)
 X_reduced = svd.fit_transform(X_cluster)
 
+# Keywords used for labelling our clusters
+genre_keywords = {
+    'Horror': ['horror', 'gore', 'scary', 'dead', 'zombie', 'vampire', 'dracula', 'frankenstein'],
+    'Comedy': ['funny', 'comedy', 'jokes', 'laugh', 'humor', 'hilarious'],
+    'Action': ['action', 'martial', 'fight', 'arts', 'sequences'],
+    'Musical': ['music', 'song', 'songs', 'musical'],
+    'War': ['war', 'soldiers', 'army', 'battle'],
+    'TV Show': ['series', 'episode', 'episodes', 'season', 'tv', 'television'],
+    'Book Adaptation': ['book', 'read', 'novel', 'books', 'adaptation'],
+    'Video Game': ['game', 'games', 'graphics', 'gameplay', 'video'],
+    'Negative Reviews': ['worst', 'terrible', 'awful', 'horrible', 'waste'],
+    'Family/Drama': ['family', 'mother', 'father'],
+}
+
+# Used for labelling our clusters
+def label_cluster(top_words):
+    scores = {}
+    for genre, keywords in genre_keywords.items():
+        overlap = len(set(top_words) & set(keywords))
+        if overlap > 0:
+            scores[genre] = overlap
+    
+    if not scores:
+        return "Unclassified"
+    
+    return max(scores, key=scores.get)
+
+# Used for identifying and calculating clusters
 def run_and_inspect_clusters(X_reduced, vectorizer, X_original, k=15, label=""):
     kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
     cluster_labels = kmeans.fit_predict(X_reduced)
@@ -78,8 +105,11 @@ def run_and_inspect_clusters(X_reduced, vectorizer, X_original, k=15, label=""):
         # Top 10 words for this cluster
         top_indices = avg_scores.argsort()[-10:][::-1]
         top_words = feature_names[top_indices]
+
+        # Auto-label the cluster based on keyword overlap
+        label = label_cluster(list(top_words))
         
-        print(f"Cluster {cluster_id} ({cluster_size} reviews): {', '.join(top_words)}")
+        print(f"Cluster {cluster_id} ({cluster_size} reviews) [{label}]: {', '.join(top_words)}")
     
     return cluster_labels
 

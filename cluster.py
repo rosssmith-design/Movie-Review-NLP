@@ -166,10 +166,30 @@ for cluster_id in range(num_clusters):
     plt.scatter(X_tsne_plot[negative_mask, 0], X_tsne_plot[negative_mask, 1],
                 color=colors[cluster_id], marker='x', s=8, alpha=0.6)
 
-plt.title('Movie Review Clusters by Genre and Sentiment (t-SNE)')
+plt.title('Movie Review Clusters by Genre (t-SNE)')
 plt.xlabel('t-SNE Dimension 1')
 plt.ylabel('t-SNE Dimension 2')
 plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', fontsize=8, markerscale=2)
 plt.tight_layout()
 plt.savefig('cluster_visualisation.png', dpi=150, bbox_inches='tight')
+plt.show()
+
+# Plot for sentimental analysis
+plt.figure(figsize=(16, 11))
+
+positive_mask_all = sentiment_pred_plot == 1
+negative_mask_all = sentiment_pred_plot == 0
+
+plt.scatter(X_tsne_plot[positive_mask_all, 0], X_tsne_plot[positive_mask_all, 1],
+            color='green', marker='o', s=8, alpha=0.4, label='Positive')
+
+plt.scatter(X_tsne_plot[negative_mask_all, 0], X_tsne_plot[negative_mask_all, 1],
+            color='red', marker='x', s=8, alpha=0.4, label='Negative')
+
+plt.title('Movie Review Clusters by Sentiment (t-SNE)')
+plt.xlabel('t-SNE Dimension 1')
+plt.ylabel('t-SNE Dimension 2')
+plt.legend(loc='upper right', fontsize=10, markerscale=2)
+plt.tight_layout()
+plt.savefig('sentiment_visualisation.png', dpi=150, bbox_inches='tight')
 plt.show()

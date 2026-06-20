@@ -6,6 +6,8 @@ import joblib
 from sklearn.decomposition import TruncatedSVD
 import numpy as np
 from sklearn.cluster import KMeans
+from sklearn.manifold import TSNE
+import matplotlib.pyplot as plt
 
 
 # All english stop words
@@ -92,6 +94,7 @@ def run_and_inspect_clusters(X_reduced, vectorizer, X_original, k=15, label=""):
     
     print(f"\n--- {label} ---")
     feature_names = np.array(vectorizer.get_feature_names_out())
+    cluster_names = {}
     
     for cluster_id in range(k):
         # Get all reviews in this cluster
@@ -107,16 +110,66 @@ def run_and_inspect_clusters(X_reduced, vectorizer, X_original, k=15, label=""):
         top_words = feature_names[top_indices]
 
         # Auto-label the cluster based on keyword overlap
-        label = label_cluster(list(top_words))
+        genre_label = label_cluster(list(top_words))
+        cluster_names[cluster_id] = genre_label
         
-        print(f"Cluster {cluster_id} ({cluster_size} reviews) [{label}]: {', '.join(top_words)}")
+        print(f"Cluster {cluster_id} ({cluster_size} reviews) [{genre_label}]: {', '.join(top_words)}")
     
-    return cluster_labels
+    return cluster_labels, cluster_names
 
 # Run on TF-IDF version
-labels_tfidf = run_and_inspect_clusters(X_reduced, cluster_vectorizer, X_cluster, k=15, label="TF-IDF + SVD (1000 components)")
+cluster_labels, cluster_names = run_and_inspect_clusters(X_reduced, cluster_vectorizer, X_cluster, k=15, label="TF-IDF + SVD (1000 components)")
 
+# Reduce to 2D for visualisation
+tsne = TSNE(n_components=2, random_state=42, perplexity=30)
+X_tsne = tsne.fit_transform(X_reduced)
+
+print("t-SNE complete")
 print(f"Matrix shape: {X_cluster.shape}")
 print(f"Reduced shape: {X_reduced.shape}")
 print(f"Variance explained: {svd.explained_variance_ratio_.sum()*100:.2f}%")
 
+# Check for outliers in the t-SNE output
+print(f"X range: {X_tsne[:, 0].min():.1f} to {X_tsne[:, 0].max():.1f}")
+print(f"Y range: {X_tsne[:, 1].min():.1f} to {X_tsne[:, 1].max():.1f}")
+
+# Eliminate the extreme outliers
+plot_mask = X_tsne[:, 0] < 500
+
+# Apply plot mask
+X_tsne_plot = X_tsne[plot_mask]
+cluster_labels_plot = cluster_labels[plot_mask]
+sentiment_pred_plot = sentiment_pred[plot_mask]
+
+
+plt.figure(figsize=(16, 11))
+
+# Get a distinct colour for each cluster
+num_clusters = len(cluster_names)
+colors = plt.cm.tab20(np.linspace(0, 1, num_clusters))
+
+# Plot each cluster separately so we can control colour, shape, and build a clean legend
+for cluster_id in range(num_clusters):
+    cluster_mask = cluster_labels_plot == cluster_id
+    genre = cluster_names[cluster_id]
+    
+    # Split this cluster by sentiment
+    positive_mask = cluster_mask & (sentiment_pred_plot == 1)
+    negative_mask = cluster_mask & (sentiment_pred_plot == 0)
+    
+    # Positive reviews - circles
+    plt.scatter(X_tsne_plot[positive_mask, 0], X_tsne_plot[positive_mask, 1],
+                color=colors[cluster_id], marker='o', s=8, alpha=0.6,
+                label=f"{genre} (Cluster {cluster_id})")
+    
+    # Negative reviews - crosses, same colour, no duplicate legend entry
+    plt.scatter(X_tsne_plot[negative_mask, 0], X_tsne_plot[negative_mask, 1],
+                color=colors[cluster_id], marker='x', s=8, alpha=0.6)
+
+plt.title('Movie Review Clusters by Genre and Sentiment (t-SNE)')
+plt.xlabel('t-SNE Dimension 1')
+plt.ylabel('t-SNE Dimension 2')
+plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', fontsize=8, markerscale=2)
+plt.tight_layout()
+plt.savefig('cluster_visualisation.png', dpi=150, bbox_inches='tight')
+plt.show()

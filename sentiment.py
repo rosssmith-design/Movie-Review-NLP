@@ -24,6 +24,8 @@ stop_words = set(ENGLISH_STOP_WORDS)
 
 # Preprocessing function for training
 def preprocess(text):
+    # Remove HTML tags (e.g. <br/>)
+    text = re.sub(r'<.*?>', ' ', text)
     # Lowercase
     text = text.lower()
     # Removes punctuation and unknown characters

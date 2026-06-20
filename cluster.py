@@ -5,6 +5,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import joblib
 from sklearn.decomposition import TruncatedSVD
 import numpy as np
+from sklearn.cluster import KMeans
 
 
 # All english stop words
@@ -12,6 +13,8 @@ stop_words = set(ENGLISH_STOP_WORDS)
 
 # Preprocessing function
 def preprocess(text):
+    # Remove HTML tags (e.g. <br/>)
+    text = re.sub(r'<.*?>', ' ', text)
     # Lowercase
     text = text.lower()
     # Removes punctuation and unknown characters
@@ -49,7 +52,32 @@ X_cluster = cluster_vectorizer.fit_transform(unsupervised_clean)
 svd =  TruncatedSVD(n_components=1000, random_state=42)
 X_reduced = svd.fit_transform(X_cluster)
 
+def run_and_inspect_clusters(X_reduced, vectorizer, X_original, k=5, label=""):
+    kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+    cluster_labels = kmeans.fit_predict(X_reduced)
+    
+    print(f"\n--- {label} ---")
+    feature_names = np.array(vectorizer.get_feature_names_out())
+    
+    for cluster_id in range(k):
+        # Get all reviews in this cluster
+        cluster_mask = cluster_labels == cluster_id
+        cluster_size = cluster_mask.sum()
+        
+        # Average TF-IDF/count score per word, just for this cluster's reviews
+        avg_scores = X_original[cluster_mask].mean(axis=0)
+        avg_scores = np.asarray(avg_scores).flatten()
+        
+        # Top 10 words for this cluster
+        top_indices = avg_scores.argsort()[-10:][::-1]
+        top_words = feature_names[top_indices]
+        
+        print(f"Cluster {cluster_id} ({cluster_size} reviews): {', '.join(top_words)}")
+    
+    return cluster_labels
 
+# Run on TF-IDF version
+labels_tfidf = run_and_inspect_clusters(X_reduced, cluster_vectorizer, X_cluster, k=5, label="TF-IDF + SVD (1000 components)")
 
 print(f"Matrix shape: {X_cluster.shape}")
 print(f"Reduced shape: {X_reduced.shape}")
